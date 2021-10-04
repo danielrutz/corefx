@@ -213,7 +213,15 @@ namespace System.IO
 
         private DateTimeOffset UnixTimeToDateTimeOffset(long seconds, long nanoseconds)
         {
-            return DateTimeOffset.FromUnixTimeSeconds(seconds).AddTicks(nanoseconds / NanosecondsPerTick).ToLocalTime();
+            try
+            {
+                return DateTimeOffset.FromUnixTimeSeconds(seconds).AddTicks(nanoseconds / NanosecondsPerTick)
+                    .ToLocalTime();
+            }
+            catch (ArgumentOutOfRangeException)
+            {
+                return DateTimeOffset.FromFileTime(0);
+            }
         }
 
         private void SetAccessWriteTimes(string path, long? accessSec, long? accessUSec, long? writeSec, long? writeUSec)
